@@ -175,7 +175,7 @@ public class WeatherFragment extends Fragment {
                 public void run() {
                     refreshView.setRefreshing(false);
                     Snackbar.make(indexLayout, getString(R.string.net_error), Snackbar.LENGTH_LONG)
-                            .setAction("设置", new View.OnClickListener() {
+                            .setAction(getString(R.string.setting), new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));

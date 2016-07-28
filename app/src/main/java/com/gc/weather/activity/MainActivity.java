@@ -40,11 +40,11 @@ public class MainActivity extends BaseActivity {
             if (cityList == null || cityList.size() <= 0) {
                 cityList = new ArrayList<>();
                 City city = new City();
-                city.setProvince_cn("广东");
-                city.setDistrict_cn("广州");
-                city.setName_cn("广州");
-                city.setName_en("guangzhou");
-                city.setArea_id("101280101");
+                city.setProvince_cn(getString(R.string.default_province_cn));
+                city.setDistrict_cn(getString(R.string.default_district_cn));
+                city.setName_cn(getString(R.string.default_name_cn));
+                city.setName_en(getString(R.string.default_name_en));
+                city.setArea_id(getString(R.string.default_area_id));
                 cityList.add(city);
             }
 

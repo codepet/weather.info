@@ -21,8 +21,16 @@
     <string name="share_weather">分享天气</string>
     <string name="current_location">当前位置</string>
     <string name="search">搜索</string>
+    <string name="setting">设置</string>
     <string name="empty_result">暂无搜索结果</string>
     <string name="empty_tips">暂无搜索结果,请检查城市名是否输入正确</string>
     <string name="search_cancel">取消</string>
     <string name="search_hint">请输入城市名</string>
+
+    <!-- 默认城市 -->
+    <string name="default_province_cn">广东</string>
+    <string name="default_district_cn">广州</string>
+    <string name="default_name_cn">广州</string>
+    <string name="default_name_en">guangzhou</string>
+    <string name="default_area_id">101280101</string>
 </resources>
