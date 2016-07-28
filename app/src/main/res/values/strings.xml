@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">易天气</string>
+    <string name="net_error">网络连接失败，请检查网络</string>
+    <string name="data_error">获取数据失败，请稍后重试</string>
+    <string name="data_success">获取数据成功</string>
+    <string name="data_unknow">无详细信息</string>
+    <string name="aqi">PM2.5</string>
+    <string name="wind_power">风力</string>
+    <string name="wind_direction">风向</string>
+    <string name="gm_index">感冒指数</string>
+    <string name="fs_index">防晒指数</string>
+    <string name="cy_index">穿衣指数</string>
+    <string name="yd_index">运动指数</string>
+    <string name="xc_index">洗车指数</string>
+    <string name="ls_index">晾晒指数</string>
+    <string name="forecast_4">未来4天天气</string>
+    <string name="history_7">过去7天天气</string>
+    <string name="today">今天</string>
+    <string name="slash">/</string>
+    <string name="city_manager">管理城市</string>
+    <string name="share_weather">分享天气</string>
+    <string name="current_location">当前位置</string>
+    <string name="search">搜索</string>
+    <string name="empty_result">暂无搜索结果</string>
+    <string name="empty_tips">暂无搜索结果,请检查城市名是否输入正确</string>
+    <string name="search_cancel">取消</string>
+    <string name="search_hint">请输入城市名</string>
+</resources>
