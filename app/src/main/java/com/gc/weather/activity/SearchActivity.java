@@ -9,7 +9,9 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -25,6 +27,7 @@ import com.gc.weather.entity.City;
 import com.gc.weather.entity.Result;
 import com.gc.weather.util.ConnUtil;
 import com.gc.weather.util.SnackbarUtil;
+import com.gc.weather.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +98,26 @@ public class SearchActivity extends BaseActivity {
                 }
             }
         });
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    if (mSearchText.getText().toString().trim().isEmpty()) {
+                        ToastUtil.show(getString(R.string.search_tips));
+                        return true;
+                    }
+                    getData();
+                    return true;
+                }
+                return false;
+            }
+        });
+        mSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getData();
+            }
+        });
     }
 
     private void initProgressBar() {
@@ -105,61 +128,60 @@ public class SearchActivity extends BaseActivity {
 
     @Override
     protected void fetchData() {
-        mSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSearchText.getText().length() > 0) {
-                    mProgressDialog.show();
-                    mCityList.clear();
-                    // 隐藏键盘
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(mSearchText.getWindowToken(), 0);
-                    if (!ConnUtil.isNetConnected(SearchActivity.this)) {
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressDialog.dismiss();
-                                Snackbar.make(mResultList, getString(R.string.net_error), Snackbar.LENGTH_LONG)
-                                        .setAction("设置", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
-                                            }
-                                        }).show();
-                            }
-                        }, 1000);
-                        return;
+
+    }
+
+    private void getData() {
+        if (mSearchText.getText().toString().trim().length() > 0) {
+            mProgressDialog.show();
+            mCityList.clear();
+            // 隐藏键盘
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mSearchText.getWindowToken(), 0);
+            if (!ConnUtil.isNetConnected(SearchActivity.this)) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressDialog.dismiss();
+                        Snackbar.make(mResultList, getString(R.string.net_error), Snackbar.LENGTH_LONG)
+                                .setAction("设置", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+                                    }
+                                }).show();
                     }
-                    BaseApplication.getService()
-                            .getCity(mSearchText.getText().toString().trim())
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .map(new Func1<Result<List<City>>, List<City>>() {
-                                @Override
-                                public List<City> call(Result<List<City>> listResult) {
-                                    if (listResult != null) {
-                                        return listResult.getRetData();
-                                    }
-                                    return null;
-                                }
-                            })
-                            .subscribe(new Action1<List<City>>() {
-                                @Override
-                                public void call(List<City> cities) {
-                                    mProgressDialog.dismiss();
-                                    if (cities == null || cities.isEmpty()) {
-                                        Snackbar.make(mResultList, getString(R.string.empty_tips), Snackbar.LENGTH_SHORT).show();
-                                        return;
-                                    }
-                                    mCityList.addAll(cities);
-                                    mAdapter.notifyDataSetChanged();
-                                }
-                            });
-                } else {
-                    finish();
-                }
+                }, 1000);
+                return;
             }
-        });
+            BaseApplication.getService()
+                    .getCity(mSearchText.getText().toString().trim())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .map(new Func1<Result<List<City>>, List<City>>() {
+                        @Override
+                        public List<City> call(Result<List<City>> listResult) {
+                            if (listResult != null) {
+                                return listResult.getRetData();
+                            }
+                            return null;
+                        }
+                    })
+                    .subscribe(new Action1<List<City>>() {
+                        @Override
+                        public void call(List<City> cities) {
+                            mProgressDialog.dismiss();
+                            if (cities == null || cities.isEmpty()) {
+                                Snackbar.make(mResultList, getString(R.string.empty_tips), Snackbar.LENGTH_SHORT).show();
+                                return;
+                            }
+                            mCityList.addAll(cities);
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    });
+        } else {
+            finish();
+        }
     }
 
     @Override

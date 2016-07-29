@@ -63,6 +63,15 @@ public class MainActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             ArrayList<City> cities = (ArrayList<City>) data.getExtras().getSerializable("cities");
+            if (cities.size() == 0) {
+                City city = new City();
+                city.setProvince_cn(getString(R.string.default_province_cn));
+                city.setDistrict_cn(getString(R.string.default_district_cn));
+                city.setName_cn(getString(R.string.default_name_cn));
+                city.setName_en(getString(R.string.default_name_en));
+                city.setArea_id(getString(R.string.default_area_id));
+                cities.add(city);
+            }
             cityList.clear();
             cityList.addAll(cities);
             mFragments.clear();

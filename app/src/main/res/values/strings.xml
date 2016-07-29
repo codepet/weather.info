@@ -26,6 +26,7 @@
     <string name="empty_tips">暂无搜索结果,请检查城市名是否输入正确</string>
     <string name="search_cancel">取消</string>
     <string name="search_hint">请输入城市名</string>
+    <string name="search_tips">城市名不能为空</string>
 
     <!-- 默认城市 -->
     <string name="default_province_cn">广东</string>

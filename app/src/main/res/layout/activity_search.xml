@@ -28,6 +28,7 @@
                     android:drawableLeft="@mipmap/ic_search"
                     android:drawablePadding="10dp"
                     android:hint="@string/search_hint"
+                    android:imeOptions="actionSearch"
                     android:singleLine="true"
                     android:textColor="@color/black_light" />
 
