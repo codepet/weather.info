@@ -30,12 +30,18 @@ public class BaseApplication extends Application {
         initNetService();
     }
 
+    /**
+     * 初始化OkHttpClient
+     */
     private void initHttpClient() {
         client = new OkHttpClient.Builder()
                 .readTimeout(READ_TIME_OUT, TimeUnit.MILLISECONDS)
                 .build();
     }
 
+    /**
+     * 初始化Retrofit，设置支持RxJava和Gson
+     */
     private void initRetrofit() {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -51,16 +57,20 @@ public class BaseApplication extends Application {
         service = retrofit.create(NetService.class);
     }
 
+    /**
+     * 获取全局上下文
+     * @return 全局上下文
+     */
     public static Context getContext() {
         return context;
     }
 
+    /**
+     * 网络请求实例
+     * @return okHttpClient
+     */
     public static OkHttpClient getHttpClient() {
         return client;
-    }
-
-    public static Retrofit getRetrofit() {
-        return retrofit;
     }
 
     public static NetService getService() {

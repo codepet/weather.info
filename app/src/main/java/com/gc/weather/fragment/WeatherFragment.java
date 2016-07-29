@@ -1,6 +1,5 @@
 package com.gc.weather.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -29,6 +28,7 @@ import com.gc.weather.entity.Index;
 import com.gc.weather.entity.Result;
 import com.gc.weather.entity.Weather;
 import com.gc.weather.util.ConnUtil;
+import com.gc.weather.util.LogUtil;
 import com.gc.weather.util.ResourceUtil;
 import com.gc.weather.util.SerializeUtil;
 import com.gc.weather.util.SnackbarUtil;
@@ -44,6 +44,7 @@ import rx.schedulers.Schedulers;
 
 public class WeatherFragment extends Fragment {
 
+    private final static String TAG = WeatherFragment.class.getSimpleName();
     private TextView currentTempText;
     private TextView cityNameText;
     private TextView aqiText;
@@ -67,8 +68,8 @@ public class WeatherFragment extends Fragment {
     public static WeatherFragment newInstance(String cityName, String cityId) {
         WeatherFragment fragment = new WeatherFragment();
         Bundle args = new Bundle();
-        args.putString("city_name", cityName);
-        args.putString("city_id", cityId);
+        args.putString("city_name", cityName);  // 设置城市名
+        args.putString("city_id", cityId);  // 设置城市id
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,8 +77,8 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        cityName = getArguments().getString("city_name");
-        cityId = getArguments().getString("city_id");
+        cityName = getArguments().getString("city_name");  // 获取城市名
+        cityId = getArguments().getString("city_id");  // 获取城市id
     }
 
     @Nullable
@@ -93,6 +94,10 @@ public class WeatherFragment extends Fragment {
         fetchData();
     }
 
+    /**
+     * 初始化所有控件
+     * @param view fragment展示的view
+     */
     private void initView(View view) {
         currentTempText = (TextView) view.findViewById(R.id.id_current_temp);
         cityNameText = (TextView) view.findViewById(R.id.id_city_name);
@@ -132,9 +137,9 @@ public class WeatherFragment extends Fragment {
     private void showPupopWindow() {
         View view = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                 .inflate(R.layout.layout_popup_view, new LinearLayout(getActivity()), false);
-        final PopupWindow window = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, false);
+        final PopupWindow window = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         Button managerButton = (Button) view.findViewById(R.id.id_manager_city);
-        managerButton.setOnClickListener(new View.OnClickListener() {
+        managerButton.setOnClickListener(new View.OnClickListener() {  // 城市管理按钮点击事件
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), CityListActivity.class);
@@ -153,11 +158,11 @@ public class WeatherFragment extends Fragment {
             }
         });
         ColorDrawable drawable = new ColorDrawable(0xB0000000);
-        window.setBackgroundDrawable(drawable);
-        window.setWidth(200);
-        window.setOutsideTouchable(true);
-        window.setFocusable(true);
-        window.showAsDropDown(menuButton, -150, 0);
+        window.setBackgroundDrawable(drawable);  // 设置一个背景
+        window.setWidth(200);  // 设置宽度
+        window.setOutsideTouchable(true);  // 点击外部取消
+        window.setFocusable(true);  // 必须设置此属性，否则点击返回键会直接退出程序
+        window.showAsDropDown(menuButton, -150, 0);  // 显示在菜单按钮下
     }
 
     public void fetchData() {
@@ -167,9 +172,11 @@ public class WeatherFragment extends Fragment {
                 setData(data);
             }
         } catch (ClassNotFoundException e) {
+            LogUtil.e(TAG, "get object throws class not found exception: " + e.getMessage());
         } catch (IOException e) {
+            LogUtil.e(TAG, "get object throws io exception: " + e.getMessage());
         }
-        if (!ConnUtil.isNetConnected(getActivity())) {
+        if (!ConnUtil.isNetConnected(getActivity())) {  // 判断网络状态
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -178,6 +185,7 @@ public class WeatherFragment extends Fragment {
                             .setAction(getString(R.string.setting), new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    // 点击可打开设置界面
                                     startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
                                 }
                             }).show();
@@ -191,6 +199,7 @@ public class WeatherFragment extends Fragment {
                 .map(new Func1<Result<Data>, Data>() {
                     @Override
                     public Data call(Result<Data> dataResult) {
+                        // 需判空和判断返回码，返回码为0表示成功
                         if (dataResult == null || dataResult.getErrNum() != 0) {
                             return null;
                         }
@@ -200,15 +209,15 @@ public class WeatherFragment extends Fragment {
                 .subscribe(new Action1<Data>() {
                     @Override
                     public void call(Data data) {
+                        refreshView.setRefreshing(false);
                         if (data == null) {
-                            refreshView.setRefreshing(false);
                             SnackbarUtil.show(indexLayout, getString(R.string.data_error));
                             return;
                         }
                         setData(data);
-                        refreshView.setRefreshing(false);
                         SnackbarUtil.show(indexLayout, getString(R.string.data_success));
                         try {
+                            // 获取数据成功后保存至本地
                             SerializeUtil.saveObject(getActivity(), data, cityId);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -217,11 +226,16 @@ public class WeatherFragment extends Fragment {
                 });
     }
 
+    /**
+     * 数据与界面绑定
+     * @param data 获取的数据
+     */
     private void setData(Data data) {
         cityNameText.setText(data.getCity());
         currentTempText.setText(data.getToday().getCurTemp());
         dateText.setText(data.getToday().getDate());
         weekText.setText(data.getToday().getWeek());
+        // aqi需判空，不是每一个城市都含有此详细信息
         if (data.getToday().getAqi() == null || data.getToday().getAqi().isEmpty()) {
             aqiText.setText(getString(R.string.data_unknow));
         } else {
@@ -234,7 +248,7 @@ public class WeatherFragment extends Fragment {
         lowTempText.setText(data.getToday().getLowtemp());
         Picasso.with(getActivity())
                 .load(ResourceUtil.getImageResource(data.getToday().getType()))
-                .placeholder(R.mipmap.undefined)
+                .placeholder(R.mipmap.undefined)  // 占位图
                 .into(weatherImage);
         // 获取未来天气
         forecastLayot.removeAllViews();

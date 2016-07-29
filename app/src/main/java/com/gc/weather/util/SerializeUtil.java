@@ -12,6 +12,13 @@ public class SerializeUtil {
 
     public static String FILENAME = "db";
 
+    /**
+     * 对象序列化保存至本地
+     * @param context 上下文
+     * @param object 保存的对象
+     * @param name 文件名
+     * @throws IOException
+     */
     public static void saveObject(Context context, Object object, String name) throws IOException {
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
@@ -29,6 +36,14 @@ public class SerializeUtil {
         }
     }
 
+    /**
+     * 反序列化成对象
+     * @param context 上下文
+     * @param name 文件名
+     * @return 序列化对象
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public static Object getObject(Context context, String name) throws IOException, ClassNotFoundException {
         FileInputStream fis = null;
         ObjectInputStream ois = null;

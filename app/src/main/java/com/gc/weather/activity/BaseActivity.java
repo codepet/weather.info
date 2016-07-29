@@ -13,7 +13,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         fetchData();
     }
 
+    /**
+     * 初始化控件
+     * @param savedInstanceState onCreate(savedInstanceState)
+     */
     protected abstract void initView(Bundle savedInstanceState);
 
+    /**
+     * 获取数据
+     */
     protected abstract void fetchData();
 }

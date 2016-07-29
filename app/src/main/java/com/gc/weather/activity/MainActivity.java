@@ -9,6 +9,7 @@ import com.gc.weather.R;
 import com.gc.weather.adapter.SimplePagerAdapter;
 import com.gc.weather.entity.City;
 import com.gc.weather.fragment.WeatherFragment;
+import com.gc.weather.util.LogUtil;
 import com.gc.weather.util.SerializeUtil;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
+    private final static String TAG = MainActivity.class.getSimpleName();
     private ViewPager mWeatherPager;
     private SimplePagerAdapter mAdapter;
     private List<Fragment> mFragments;
@@ -30,13 +32,17 @@ public class MainActivity extends BaseActivity {
         mWeatherPager = (ViewPager) findViewById(R.id.id_weather_page);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void fetchData() {
         try {
             cityList = (ArrayList<City>) SerializeUtil.getObject(this, "cities");
         } catch (IOException e) {
+            LogUtil.e(TAG, "get object throws io exception: " + e.getMessage());
         } catch (ClassNotFoundException e) {
+            LogUtil.e(TAG, "get object throws class not found exception: " + e.getMessage());
         } finally {
+            // 如果本地没有存储数据，则添加默认的城市
             if (cityList == null || cityList.size() <= 0) {
                 cityList = new ArrayList<>();
                 City city = new City();
@@ -58,12 +64,13 @@ public class MainActivity extends BaseActivity {
         mWeatherPager.setOffscreenPageLimit(mFragments.size() - 1);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             ArrayList<City> cities = (ArrayList<City>) data.getExtras().getSerializable("cities");
-            if (cities.size() == 0) {
+            if (cities != null && cities.size() == 0) {  // 如果返回城市数为0,则添加默认城市
                 City city = new City();
                 city.setProvince_cn(getString(R.string.default_province_cn));
                 city.setDistrict_cn(getString(R.string.default_district_cn));
@@ -79,6 +86,7 @@ public class MainActivity extends BaseActivity {
                 mFragments.add(WeatherFragment.newInstance(city.getName_cn(), city.getArea_id()));
             }
             mAdapter.notifyDataSetChanged();
+            // 重新设置预加载数，否则新添加的城市不会自动更新天气信息
             mWeatherPager.setOffscreenPageLimit(mFragments.size() - 1);
         }
     }
@@ -89,6 +97,7 @@ public class MainActivity extends BaseActivity {
         try {
             SerializeUtil.saveObject(this, cityList, "cities");
         } catch (IOException e) {
+            LogUtil.e(TAG, "save object throws io exception: " + e.getMessage());
         }
     }
 

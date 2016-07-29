@@ -38,7 +38,7 @@ public class ArrayListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
+        ViewHolder holder;
         if (convertView == null) {
             convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             holder = new ViewHolder();
@@ -47,7 +47,8 @@ public class ArrayListAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        String name = list.get(position).getProvince_cn() + " ● " + list.get(position).getDistrict_cn() + " ● " + list.get(position).getName_cn();
+        // 因存在同名城市，所以结果以省-市-地方式展示
+        String name = list.get(position).getProvince_cn() + " - " + list.get(position).getDistrict_cn() + " - " + list.get(position).getName_cn();
         holder.text.setText(name);
         return convertView;
     }

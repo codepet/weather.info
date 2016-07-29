@@ -45,6 +45,7 @@ public class SwipeRecyclerAdapter extends RecyclerView.Adapter<SwipeRecyclerAdap
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
+        // 上下平移，交换数据，并通知更新
         Collections.swap(list, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
         return true;
@@ -52,6 +53,7 @@ public class SwipeRecyclerAdapter extends RecyclerView.Adapter<SwipeRecyclerAdap
 
     @Override
     public void onItemDismiss(int position) {
+        // 左右滑动删除数据，并通知更新
         list.remove(position);
         notifyItemRemoved(position);
     }
@@ -65,12 +67,17 @@ public class SwipeRecyclerAdapter extends RecyclerView.Adapter<SwipeRecyclerAdap
             cityName = (TextView) itemView.findViewById(R.id.id_city_name);
         }
 
-
+        /**
+         * Item被选中时回调，改变背景颜色
+         */
         @Override
         public void onItemSelected() {
             itemView.setBackgroundColor(Color.parseColor("#B0CECECE"));
         }
 
+        /**
+         * Item无状态时回调，设置清除背景颜色
+         */
         @Override
         public void onItemClear() {
             itemView.setBackgroundColor(0);

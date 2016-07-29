@@ -27,6 +27,9 @@ public class SimplePagerAdapter extends FragmentStatePagerAdapter {
         return fragments.size();
     }
 
+    /**
+     * 需重写这个方法，FragmentPagerAdapter不需要
+     */
     @Override
     public int getItemPosition(Object object) {
         return PagerAdapter.POSITION_NONE;
