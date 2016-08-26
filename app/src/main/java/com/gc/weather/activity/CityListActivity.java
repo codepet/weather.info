@@ -12,7 +12,7 @@ import com.gc.weather.R;
 import com.gc.weather.adapter.SwipeRecyclerAdapter;
 import com.gc.weather.callback.SimpleItemTouchHelperCallback;
 import com.gc.weather.entity.City;
-import com.gc.weather.view.DividerItemDecoration;
+import com.gc.weather.widget.DividerItemDecoration;
 
 import java.util.ArrayList;
 

@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,28 +41,28 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class WeatherFragment extends Fragment {
+public class WeatherFragment extends BaseFragment {
 
     private final static String TAG = WeatherFragment.class.getSimpleName();
-    private TextView currentTempText;
-    private TextView cityNameText;
-    private TextView aqiText;
-    private TextView windDirectionText;
-    private TextView windPowerText;
-    private TextView weekText;
-    private TextView weatherTypeText;
-    private TextView dateText;
-    private TextView highTempText;
-    private TextView lowTempText;
-    private ImageView weatherImage;
-    private LinearLayout forecastLayot;
-    private LinearLayout historyLayout;
-    private LinearLayout indexLayout;
-    private PullToRefreshView refreshView;
-    private ImageButton menuButton;
+    private TextView currentTempText;  // 当前温度
+    private TextView cityNameText;  // 城市名
+    private TextView aqiText;  // PM2.5
+    private TextView windDirectionText; // 风向
+    private TextView windPowerText; //风力
+    private TextView weekText; // 周日期
+    private TextView weatherTypeText; // 天气类型
+    private TextView dateText;  // 日期
+    private TextView highTempText;  // 最高温度
+    private TextView lowTempText;  // 最低温度
+    private ImageView weatherImage;  // 天气类型图片
+    private LinearLayout forecastLayot;  // 未来天气的布局
+    private LinearLayout historyLayout;  //历史天气的布局
+    private LinearLayout indexLayout;  // 天气指数建议布局
+    private PullToRefreshView refreshView;  // 下拉刷新布局
+    private ImageButton menuButton;  // 菜单按钮
 
-    private String cityName;
-    private String cityId;
+    private String cityName;  // 城市名
+    private String cityId;  // 城市id
 
     public static WeatherFragment newInstance(String cityName, String cityId) {
         WeatherFragment fragment = new WeatherFragment();
@@ -91,11 +90,12 @@ public class WeatherFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
-        fetchData();
+        initData();
     }
 
     /**
      * 初始化所有控件
+     *
      * @param view fragment展示的view
      */
     private void initView(View view) {
@@ -134,38 +134,10 @@ public class WeatherFragment extends Fragment {
         });
     }
 
-    private void showPupopWindow() {
-        View view = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                .inflate(R.layout.layout_popup_view, new LinearLayout(getActivity()), false);
-        final PopupWindow window = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        Button managerButton = (Button) view.findViewById(R.id.id_manager_city);
-        managerButton.setOnClickListener(new View.OnClickListener() {  // 城市管理按钮点击事件
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), CityListActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("cities", MainActivity.instance.getCityList());
-                intent.putExtras(bundle);
-                getActivity().startActivityForResult(intent, 300);
-                window.dismiss();
-            }
-        });
-        Button shareButton = (Button) view.findViewById(R.id.id_share_weather);
-        shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-        ColorDrawable drawable = new ColorDrawable(0xB0000000);
-        window.setBackgroundDrawable(drawable);  // 设置一个背景
-        window.setWidth(200);  // 设置宽度
-        window.setOutsideTouchable(true);  // 点击外部取消
-        window.setFocusable(true);  // 必须设置此属性，否则点击返回键会直接退出程序
-        window.showAsDropDown(menuButton, -150, 0);  // 显示在菜单按钮下
-    }
-
-    public void fetchData() {
+    /**
+     * 从本地文件获取缓存数据
+     */
+    private void initData() {
         try {
             Data data = (Data) SerializeUtil.getObject(getActivity(), cityId);
             if (data != null) {
@@ -176,8 +148,25 @@ public class WeatherFragment extends Fragment {
         } catch (IOException e) {
             LogUtil.e(TAG, "get object throws io exception: " + e.getMessage());
         }
+    }
+
+    /**
+     * 界面可见时调用
+     */
+    @Override
+    public void fetchData() {
+        if (!connect()) return;
+        pullData();
+    }
+
+    /**
+     * 判断网络连接
+     *
+     * @return 网络是否连接
+     */
+    private boolean connect() {
         if (!ConnUtil.isNetConnected(getActivity())) {  // 判断网络状态
-            new Handler().postDelayed(new Runnable() {
+            new Handler().postDelayed(new Runnable() {  // 无网络延时1000ms提示
                 @Override
                 public void run() {
                     refreshView.setRefreshing(false);
@@ -191,10 +180,17 @@ public class WeatherFragment extends Fragment {
                             }).show();
                 }
             }, 1000);
-            return;
+            return false;
         }
+        return true;
+    }
+
+    /**
+     * 获取数据
+     */
+    private void pullData() {
         BaseApplication.getService().getWeather(cityName, cityId)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())  // 请求数据于IO线程
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<Result<Data>, Data>() {
                     @Override
@@ -210,7 +206,7 @@ public class WeatherFragment extends Fragment {
                     @Override
                     public void call(Data data) {
                         refreshView.setRefreshing(false);
-                        if (data == null) {
+                        if (data == null) {  // 数据为空，提示获取失败
                             SnackbarUtil.show(indexLayout, getString(R.string.data_error));
                             return;
                         }
@@ -228,9 +224,22 @@ public class WeatherFragment extends Fragment {
 
     /**
      * 数据与界面绑定
+     *
      * @param data 获取的数据
      */
     private void setData(Data data) {
+        setToday(data);
+        setFuture(data);
+        setHistory(data);
+        setIndex(data);
+    }
+
+    /**
+     * 设置今天的数据
+     *
+     * @param data 数据
+     */
+    private void setToday(Data data) {
         cityNameText.setText(data.getCity());
         currentTempText.setText(data.getToday().getCurTemp());
         dateText.setText(data.getToday().getDate());
@@ -250,7 +259,14 @@ public class WeatherFragment extends Fragment {
                 .load(ResourceUtil.getImageResource(data.getToday().getType()))
                 .placeholder(R.mipmap.undefined)  // 占位图
                 .into(weatherImage);
-        // 获取未来天气
+    }
+
+    /**
+     * 设置未来天气数据
+     *
+     * @param data 数据
+     */
+    private void setFuture(Data data) {
         forecastLayot.removeAllViews();
         for (Weather weather : data.getForecast()) {
             View view = LayoutInflater.from(getActivity())
@@ -266,13 +282,20 @@ public class WeatherFragment extends Fragment {
             date.setText(weather.getDate());
             hightemp.setText(weather.getHightemp());
             lowtemp.setText(weather.getLowtemp());
-            Picasso.with(getActivity())
+            Picasso.with(getActivity())  // 利用Picasso加载本地图片
                     .load(ResourceUtil.getImageResource(weather.getType()))
-                    .placeholder(R.mipmap.undefined)
+                    .placeholder(R.mipmap.undefined)  // 占位图
                     .into(image);
             forecastLayot.addView(view);
         }
-        // 获取历史天气
+    }
+
+    /**
+     * 设置历史天气数据
+     *
+     * @param data 数据
+     */
+    private void setHistory(Data data) {
         historyLayout.removeAllViews();
         for (Weather weather : data.getHistory()) {
             View view = LayoutInflater.from(getActivity())
@@ -294,7 +317,14 @@ public class WeatherFragment extends Fragment {
                     .into(image);
             historyLayout.addView(view);
         }
-        // 获取建议指数
+    }
+
+    /**
+     * 设置建议指数
+     *
+     * @param data 数据
+     */
+    private void setIndex(Data data) {
         indexLayout.removeAllViews();
         for (Index index : data.getToday().getIndex()) {
             View view = LayoutInflater.from(getActivity())
@@ -307,5 +337,42 @@ public class WeatherFragment extends Fragment {
             detail.setText(index.getDetails());
             indexLayout.addView(view);
         }
+    }
+
+
+    /**
+     * 二级菜单使用PopupWindow
+     */
+    private void showPupopWindow() {
+        // Fragment Inflater 使用((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+        // Activity Inflater 使用LayoutInflater.from(getActivity())
+        View view = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                .inflate(R.layout.layout_popup_view, new LinearLayout(getActivity()), false);
+        final PopupWindow window = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        Button managerButton = (Button) view.findViewById(R.id.id_manager_city);
+        managerButton.setOnClickListener(new View.OnClickListener() {  // 城市管理按钮点击事件
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), CityListActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("cities", ((MainActivity) getActivity()).getCityList());
+                intent.putExtras(bundle);
+                getActivity().startActivityForResult(intent, 300);
+                window.dismiss();
+            }
+        });
+        Button shareButton = (Button) view.findViewById(R.id.id_share_weather);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO 添加分享功能
+            }
+        });
+        ColorDrawable drawable = new ColorDrawable(0xB0000000);  // 半透明背景
+        window.setBackgroundDrawable(drawable);  // 设置一个背景
+        window.setWidth(200);  // 设置宽度
+        window.setOutsideTouchable(true);  // 点击外部取消
+        window.setFocusable(true);  // 必须设置此属性，否则点击返回键会直接退出程序
+        window.showAsDropDown(menuButton, -150, 0);  // 显示在菜单按钮下
     }
 }

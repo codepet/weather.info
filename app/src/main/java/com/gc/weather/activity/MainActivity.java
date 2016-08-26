@@ -23,37 +23,27 @@ public class MainActivity extends BaseActivity {
     private SimplePagerAdapter mAdapter;
     private List<Fragment> mFragments;
     private ArrayList<City> cityList;
-    public static MainActivity instance;
 
     @Override
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
-        instance = this;
         mWeatherPager = (ViewPager) findViewById(R.id.id_weather_page);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void fetchData() {
         try {
             cityList = (ArrayList<City>) SerializeUtil.getObject(this, "cities");
+            // 如果本地没有存储数据，则添加默认的城市
+            if (cityList == null || cityList.size() <= 0) {
+                cityList = new ArrayList<>();
+                City city = getDeafultCity();
+                cityList.add(city);
+            }
         } catch (IOException e) {
             LogUtil.e(TAG, "get object throws io exception: " + e.getMessage());
         } catch (ClassNotFoundException e) {
             LogUtil.e(TAG, "get object throws class not found exception: " + e.getMessage());
-        } finally {
-            // 如果本地没有存储数据，则添加默认的城市
-            if (cityList == null || cityList.size() <= 0) {
-                cityList = new ArrayList<>();
-                City city = new City();
-                city.setProvince_cn(getString(R.string.default_province_cn));
-                city.setDistrict_cn(getString(R.string.default_district_cn));
-                city.setName_cn(getString(R.string.default_name_cn));
-                city.setName_en(getString(R.string.default_name_en));
-                city.setArea_id(getString(R.string.default_area_id));
-                cityList.add(city);
-            }
-
         }
         mFragments = new ArrayList<>();
         for (City city : cityList) {
@@ -71,17 +61,13 @@ public class MainActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             ArrayList<City> cities = (ArrayList<City>) data.getExtras().getSerializable("cities");
             if (cities != null && cities.size() == 0) {  // 如果返回城市数为0,则添加默认城市
-                City city = new City();
-                city.setProvince_cn(getString(R.string.default_province_cn));
-                city.setDistrict_cn(getString(R.string.default_district_cn));
-                city.setName_cn(getString(R.string.default_name_cn));
-                city.setName_en(getString(R.string.default_name_en));
-                city.setArea_id(getString(R.string.default_area_id));
+                City city = getDeafultCity();
                 cities.add(city);
             }
+            // 去掉list1有list2没有&&添加list2有list1没有，即list2复制给list1
             cityList.clear();
             cityList.addAll(cities);
-            mFragments.clear();
+            mFragments.clear();  // 相同城市会再次请求数据，造成不必要流量的浪费
             for (City city : cityList) {
                 mFragments.add(WeatherFragment.newInstance(city.getName_cn(), city.getArea_id()));
             }
@@ -89,6 +75,16 @@ public class MainActivity extends BaseActivity {
             // 重新设置预加载数，否则新添加的城市不会自动更新天气信息
             mWeatherPager.setOffscreenPageLimit(mFragments.size() - 1);
         }
+    }
+
+    private City getDeafultCity() {
+        City city = new City();
+        city.setProvince_cn(getString(R.string.default_province_cn));
+        city.setDistrict_cn(getString(R.string.default_district_cn));
+        city.setName_cn(getString(R.string.default_name_cn));
+        city.setName_en(getString(R.string.default_name_en));
+        city.setArea_id(getString(R.string.default_area_id));
+        return city;
     }
 
     @Override
