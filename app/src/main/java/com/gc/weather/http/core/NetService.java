@@ -1,4 +1,4 @@
-package com.gc.weather.service;
+package com.gc.weather.http.core;
 
 import com.gc.weather.entity.City;
 import com.gc.weather.entity.Data;

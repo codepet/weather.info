@@ -1,4 +1,4 @@
-package com.gc.weather.util;
+package com.gc.weather.common;
 
 import android.util.Log;
 

@@ -1,4 +1,4 @@
-package com.gc.weather.fragment;
+package com.gc.weather.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

@@ -1,4 +1,4 @@
-package com.gc.weather.fragment;
+package com.gc.weather.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,18 +19,18 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.gc.weather.R;
-import com.gc.weather.activity.CityListActivity;
-import com.gc.weather.activity.MainActivity;
+import com.gc.weather.ui.activity.CityListActivity;
+import com.gc.weather.ui.activity.MainActivity;
 import com.gc.weather.app.BaseApplication;
 import com.gc.weather.entity.Data;
 import com.gc.weather.entity.Index;
 import com.gc.weather.entity.Result;
 import com.gc.weather.entity.Weather;
-import com.gc.weather.util.ConnUtil;
-import com.gc.weather.util.LogUtil;
-import com.gc.weather.util.ResourceUtil;
-import com.gc.weather.util.SerializeUtil;
-import com.gc.weather.util.SnackbarUtil;
+import com.gc.weather.common.ConnUtil;
+import com.gc.weather.common.LogUtil;
+import com.gc.weather.common.ResourceUtil;
+import com.gc.weather.common.SerializeUtil;
+import com.gc.weather.common.SnackbarUtil;
 import com.squareup.picasso.Picasso;
 import com.yalantis.phoenix.PullToRefreshView;
 
@@ -156,7 +156,7 @@ public class WeatherFragment extends BaseFragment {
     @Override
     public void fetchData() {
         if (!connect()) return;
-        pullData();
+        fetch();
     }
 
     /**
@@ -188,10 +188,16 @@ public class WeatherFragment extends BaseFragment {
     /**
      * 获取数据
      */
-    private void pullData() {
+    private void fetch() {
         BaseApplication.getService().getWeather(cityName, cityId)
                 .subscribeOn(Schedulers.io())  // 请求数据于IO线程
                 .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturn(new Func1<Throwable, Result<Data>>() {
+                    @Override
+                    public Result<Data> call(Throwable throwable) {
+                        return null;
+                    }
+                })
                 .map(new Func1<Result<Data>, Data>() {
                     @Override
                     public Data call(Result<Data> dataResult) {

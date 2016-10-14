@@ -1,8 +1,7 @@
-package com.gc.weather.adapter;
+package com.gc.weather.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gc.weather.R;
-import com.gc.weather.callback.OnMovedAndSwipedListener;
-import com.gc.weather.callback.OnStateChangeListener;
+import com.gc.weather.ui.callback.OnMovedAndSwipedListener;
+import com.gc.weather.ui.callback.OnStateChangeListener;
 import com.gc.weather.entity.City;
 
 import java.util.Collections;

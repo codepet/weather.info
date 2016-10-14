@@ -1,4 +1,4 @@
-package com.gc.weather.callback;
+package com.gc.weather.ui.callback;
 
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;

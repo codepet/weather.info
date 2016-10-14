@@ -1,4 +1,4 @@
-package com.gc.weather.activity;
+package com.gc.weather.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,10 +9,10 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 import com.gc.weather.R;
-import com.gc.weather.adapter.SwipeRecyclerAdapter;
-import com.gc.weather.callback.SimpleItemTouchHelperCallback;
+import com.gc.weather.ui.adapter.SwipeRecyclerAdapter;
+import com.gc.weather.ui.callback.SimpleItemTouchHelperCallback;
 import com.gc.weather.entity.City;
-import com.gc.weather.widget.DividerItemDecoration;
+import com.gc.weather.ui.widget.DividerItemDecoration;
 
 import java.util.ArrayList;
 

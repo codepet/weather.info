@@ -1,4 +1,4 @@
-package com.gc.weather.widget;
+package com.gc.weather.ui.widget;
 
 /*
  * Copyright (C) 2014 The Android Open Source Project

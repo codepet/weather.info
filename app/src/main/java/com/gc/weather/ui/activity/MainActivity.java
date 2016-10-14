@@ -1,4 +1,4 @@
-package com.gc.weather.activity;
+package com.gc.weather.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,11 +6,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 
 import com.gc.weather.R;
-import com.gc.weather.adapter.SimplePagerAdapter;
+import com.gc.weather.ui.adapter.SimplePagerAdapter;
 import com.gc.weather.entity.City;
-import com.gc.weather.fragment.WeatherFragment;
-import com.gc.weather.util.LogUtil;
-import com.gc.weather.util.SerializeUtil;
+import com.gc.weather.ui.fragment.WeatherFragment;
+import com.gc.weather.common.LogUtil;
+import com.gc.weather.common.SerializeUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,20 +30,21 @@ public class MainActivity extends BaseActivity {
         mWeatherPager = (ViewPager) findViewById(R.id.id_weather_page);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void fetchData() {
         try {
             cityList = (ArrayList<City>) SerializeUtil.getObject(this, "cities");
-            // 如果本地没有存储数据，则添加默认的城市
-            if (cityList == null || cityList.size() <= 0) {
-                cityList = new ArrayList<>();
-                City city = getDeafultCity();
-                cityList.add(city);
-            }
         } catch (IOException e) {
             LogUtil.e(TAG, "get object throws io exception: " + e.getMessage());
         } catch (ClassNotFoundException e) {
             LogUtil.e(TAG, "get object throws class not found exception: " + e.getMessage());
+        }
+        // 如果本地没有存储数据，则添加默认的城市
+        if (cityList == null || cityList.size() <= 0) {
+            cityList = new ArrayList<>();
+            City city = getDeafultCity();
+            cityList.add(city);
         }
         mFragments = new ArrayList<>();
         for (City city : cityList) {

@@ -1,4 +1,4 @@
-package com.gc.weather.activity;
+package com.gc.weather.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

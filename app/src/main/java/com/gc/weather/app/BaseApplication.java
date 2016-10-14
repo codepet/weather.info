@@ -3,7 +3,7 @@ package com.gc.weather.app;
 import android.app.Application;
 import android.content.Context;
 
-import com.gc.weather.service.NetService;
+import com.gc.weather.http.core.NetService;
 
 import java.util.concurrent.TimeUnit;
 

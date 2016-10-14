@@ -1,4 +1,4 @@
-package com.gc.weather.callback;
+package com.gc.weather.ui.callback;
 
 public interface OnStateChangeListener {
 

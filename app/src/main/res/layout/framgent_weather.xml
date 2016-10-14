@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white"
+        android:overScrollMode="never"
         android:scrollbars="none">
 
         <LinearLayout
@@ -19,7 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="320dp"
                 android:background="@drawable/sky"
-                android:padding="20dp">
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/id_current_temp"
@@ -147,7 +148,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="10dp">
+                android:padding="16dp">
 
                 <ImageView
                     android:id="@+id/id_weather_image"
@@ -218,19 +219,45 @@
 
             <include layout="@layout/layout_divider" />
 
-            <LinearLayout
-                android:id="@+id/id_forecast_layout"
+            <TextView
+                style="@style/TextViewStyle"
+                android:layout_gravity="center"
+                android:padding="16dp"
+                android:text="未来四天天气" />
+
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/id_forecast_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
 
             <include layout="@layout/layout_divider" />
 
-            <LinearLayout
-                android:id="@+id/id_history_layout"
+            <TextView
+                style="@style/TextViewStyle"
+                android:layout_gravity="center"
+                android:padding="16dp"
+                android:text="过去五天天气" />
+
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/id_history_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
 
             <include layout="@layout/layout_divider" />
 
