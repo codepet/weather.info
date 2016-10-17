@@ -119,10 +119,8 @@ public class SearchActivity extends BaseActivity implements ISearchView {
     @Override
     protected void onStop() {
         super.onStop();
-        // 在Activity finish()前需取消Dialog的绑定，否则会抛出异常
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
+        hideLoadingDialog();
+        mPresenter = null;
     }
 
     @Override
@@ -160,7 +158,9 @@ public class SearchActivity extends BaseActivity implements ISearchView {
 
     @Override
     public void hideLoadingDialog() {
-        mProgressDialog.dismiss();
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
     }
 
     @Override

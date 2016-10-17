@@ -1,11 +1,14 @@
 package com.gc.weather.ui.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 
 import com.gc.weather.R;
+import com.gc.weather.common.Action;
 import com.gc.weather.ui.adapter.SimplePagerAdapter;
 import com.gc.weather.entity.City;
 import com.gc.weather.ui.fragment.WeatherFragment;
@@ -75,6 +78,7 @@ public class MainActivity extends BaseActivity {
             mAdapter.notifyDataSetChanged();
             // 重新设置预加载数，否则新添加的城市不会自动更新天气信息
             mWeatherPager.setOffscreenPageLimit(mFragments.size() - 1);
+
         }
     }
 
@@ -100,5 +104,38 @@ public class MainActivity extends BaseActivity {
 
     public ArrayList<City> getCityList() {
         return cityList;
+    }
+
+    public static class UpdateReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            switch (action) {
+                case Action.ADD:
+                    add(intent);
+                    break;
+                case Action.DELETE:
+                    delete(intent);
+                    break;
+                case Action.EXCHANGE:
+                    exchage(intent);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void add(Intent intent) {
+
+        }
+
+        private void delete(Intent intent) {
+
+        }
+
+        private void exchage(Intent intent) {
+
+        }
     }
 }
